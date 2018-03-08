@@ -1,0 +1,131 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>wuxia</title>
+    <link rel="stylesheet" type="text/css" href="css/iview.css">
+    <script type="text/javascript" src="js/vue.js"></script>
+    <script type="text/javascript" src="js/iview.js"></script>
+    <script type="text/javascript" src="js/data.js"></script>
+    <script type="text/javascript" src="js/c.js"></script>
+    <style>
+        #app{
+            width: 600px;
+            margin: 0 auto;
+            position: relative;
+            top:100px;
+            /* border: 1px solid #ccc; */
+            height: 480px;
+            padding: 20px;
+        }
+        .localName{
+            font-size: 20px;
+        }
+        .shuaxin{
+            margin-left: 20px;
+            
+        }
+        .Spaces{
+            width: 100%;
+            height: 20px;
+        }
+        .button1{
+            display:block;
+            
+        }
+        .button2{
+            margin-top:200px;
+            display:block;
+            float: left;
+        }
+        .button3{
+            margin-top:200px;
+            float: left;
+            margin-left: 10px;
+            display:block;
+        }
+        .bag{
+            position: absolute;
+            right: 0;
+            top:0;
+        }
+        .bag-title{
+            font-size: 20px;
+        }
+        .bag-list{
+            display: block;
+            font-size: 14px;
+            margin-top:5px;
+        }
+        .bag-list a{
+            margin: 0 5px 0 5px;
+        }
+    </style>
+    
+    
+</head>
+<body>
+    <div id='app'>
+        <span class='localName'>[ 新手村 ]</span><a class='shuaxin' href="#">刷新</a>
+        <div class='Spaces'></div>
+        <p v-show="news">{{news}}</p>
+        <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
+        <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
+        <i-Button class='button3' type="primary" @click='gongfa'>功法</i-Button>
+        <p v-show='bagoff' class='bag'>
+            <span class='bag-title'>[物品列表]</span>
+            <span class='bag-list'>你身上有碎银{{money}}两<a href="#">充值</a></span>
+            <span class='bag-list'>负重：{{weight}}/{{maxweight}}<a href="#">充值</a></span>            
+            <span v-for='(item, index) in nowbag' class='bag-list'>{{index}}.<a href="#">{{item.name}}</a><a href="#">使用</a><a href="#">出售</a><a href="#">送人</a></span>
+        </p>
+        
+    </div>
+    
+    <script>
+        var app = new Vue({
+            el:'#app',
+            data:{
+                news:'',
+                money:100,
+                weight:0,
+                maxweight:100,
+                nowbag:[],
+                bagoff:!false
+            },
+            methods:{
+                hasbook:function(){
+    
+                    
+                    var book = data.books;
+                    var rnum = cr(0,book.length-1);
+                    var newbook = book[rnum];
+                    console.log(newbook);
+                    var nowbag = cgetdata('bag');
+                    console.log(nowbag)
+                    // return;
+                    // 初始化
+                    if(!nowbag){
+                        console.log('初始化...');
+                        nowbag = [];
+                    }
+                    console.log(nowbag);
+                    nowbag.push(newbook);
+                    console.log(nowbag);
+                    return;
+                    csetdata('bag',nowbag[0]);
+
+                },
+                openbag:function(){
+                    this.bagoff = !this.bagoff;
+                    this.nowbag = cgetdata('bag');
+                },
+                gongfa:function(){
+cdeldata('bag')
+    return;
+                }
+            }
+        })
+    </script>
+    </body>
+    </html>
