@@ -95,13 +95,11 @@
             },
             methods:{
                 hasbook:function(){
-    
-                    
                     var book = data.books;
                     var rnum = cr(0,book.length-1);
                     var newbook = book[rnum];
                     console.log(newbook);
-                    var nowbag = cgetdata('bag');
+                    var nowbag = strToJson(cgetdata('bag'));
                     console.log(nowbag)
                     // return;
                     // 初始化
@@ -110,15 +108,16 @@
                         nowbag = [];
                     }
                     console.log(nowbag);
+                    console.log(newbook);
                     nowbag.push(newbook);
                     console.log(nowbag);
-                    return;
-                    csetdata('bag',nowbag[0]);
+                    // return;
+                    csetdata('bag',JsonToStr(nowbag));
 
                 },
                 openbag:function(){
                     this.bagoff = !this.bagoff;
-                    this.nowbag = cgetdata('bag');
+                    this.nowbag = strToJson(cgetdata('bag'));
                 },
                 gongfa:function(){
 cdeldata('bag')
