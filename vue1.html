@@ -99,25 +99,27 @@
                     var rnum = cr(0,book.length-1);
                     var newbook = book[rnum];
                     console.log(newbook);
-                    var nowbag = strToJson(cgetdata('bag'));
+                    var nowbag = cgetdata('bag');
                     console.log(nowbag)
                     // return;
                     // 初始化
                     if(!nowbag){
                         console.log('初始化...');
                         nowbag = [];
+                    }else{
+                        nowbag = str2arr(nowbag);
                     }
                     console.log(nowbag);
                     console.log(newbook);
                     nowbag.push(newbook);
                     console.log(nowbag);
                     // return;
-                    csetdata('bag',JsonToStr(nowbag));
+                    csetdata('bag',arr2str(nowbag));
 
                 },
                 openbag:function(){
                     this.bagoff = !this.bagoff;
-                    this.nowbag = strToJson(cgetdata('bag'));
+                    this.nowbag = str2arr(cgetdata('bag'));
                 },
                 gongfa:function(){
 cdeldata('bag')

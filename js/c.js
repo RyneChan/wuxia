@@ -84,3 +84,49 @@ function cheakbag(list,lists,num){
 		}
 	}
 }
+start();
+// 初始化
+function start(){
+	for(var i in data.books){
+		console.log(i);
+		data.books[i]['id'] = (+i+1);
+	}
+	setTimeout(function(){
+		console.log(data);
+	},1000);
+
+	// 初始化id
+	if(!cgetdata('id')){
+		var a = changeid();
+		csetdata('id',a);
+		console.log('设置id'+a);
+	}
+}
+
+
+console.log(cgetdata('id'));
+
+// 设置id
+function changeid(){
+	var a =0;
+	for(var i=0;i<11;i++){
+		a+=cr(0,9).toString();
+	}
+	return a;
+}
+
+function sendfirend(fid,pid){
+	var a = "075851282781";
+	var p = 10;
+	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	var b = [];
+	for(var i=0;i<21;i++){
+		b[i] = str[cr(0,str.length)]
+	}
+	b[3] = a[3];
+	b[6] = a[6];
+	b[9] = a[9];
+	console.log(b.join(''));
+
+}
+sendfirend();
