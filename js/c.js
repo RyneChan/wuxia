@@ -88,12 +88,11 @@ start();
 // 初始化
 function start(){
 	for(var i in data.books){
-		console.log(i);
 		data.books[i]['id'] = (+i+1);
 	}
-	setTimeout(function(){
-		console.log(data);
-	},1000);
+	// setTimeout(function(){
+	// 	console.log(data);
+	// },1000);
 
 	// 初始化id
 	if(!cgetdata('id')){
@@ -101,6 +100,13 @@ function start(){
 		csetdata('id',a);
 		console.log('设置id'+a);
 	}
+	if(!cgetdata('money')){
+		csetdata('money',100);
+	}
+	if(!cgetdata('username')){
+		csetdata('username','无名氏');
+	}
+
 }
 
 
@@ -114,19 +120,65 @@ function changeid(){
 	}
 	return a;
 }
-
+var iiid = '';
 function sendfirend(fid,pid){
-	var a = "075851282781";
-	var p = 10;
-	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
-	var b = [];
-	for(var i=0;i<21;i++){
-		b[i] = str[cr(0,str.length)]
-	}
-	b[3] = a[3];
-	b[6] = a[6];
-	b[9] = a[9];
-	console.log(b.join(''));
+	// var a = "066214031991";
+	var a = fid;
 
+	// var p = 21;
+	var p = pid;
+	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+	var b = [];
+	for(var i=0;i<41;i++){
+		b[i] = str[cr(0,str.length-1)]
+	}
+	var wei = cr(1,4);
+	console.log('wei',wei)
+	
+	b[wei] = a[wei];
+	b[wei*2] = a[wei*2];
+	b[wei*2+1] = a[wei*2+1];
+	b[28] = wei;
+	var wei1 =cr(31,40);
+	console.log('wei1',wei1)
+	b[29] = str[wei1]
+	console.log('wei29',str[wei1])
+	
+	b[wei1] = p.toString(16);
+	// var www = 'a';
+	// console.log(p.toString(16))
+	// console.log(parseInt(www,16))
+	console.log(b.join(''));
+	iiid = b.join('');
+	return iiid;
 }
-sendfirend();
+sendfirend('066214031991',21);
+
+var aasd = hasfirend('066214031991',iiid)
+console.log(aasd)
+function hasfirend(uid,code){
+	// var uid =  "066214031991";
+	// var code = 'Pbs2Id0dW9rO8eExjAp5CEX1Mkqz3kHqSIDK15EvrW';
+	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+	var wei = code[28];
+	if(code[wei]==uid[wei]){
+		if(code[wei*2]==uid[wei*2]){
+			if(code[wei*2+1]==uid[wei*2+1]){
+				var a = str.indexOf(code[29]);
+				var h = '';
+				console.log('29wei'+code[29])
+				console.log('a'+a)
+				for(let i=0;i<code.length-40;i++){
+					h = h+code[(a+i)];
+				}
+				return parseInt(h,16)
+			}else{
+				console.log('验证失败');
+			}
+		}else{
+			console.log('验证失败');
+		}
+	}else{
+		console.log('验证失败');
+	}
+}

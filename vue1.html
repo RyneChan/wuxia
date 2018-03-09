@@ -47,8 +47,12 @@
         }
         .bag{
             position: absolute;
-            right: 0;
+            right: -300px;
+            width: 300px;
             top:0;
+        }
+        .bag-describe{
+            width: 300px;
         }
         .bag-title{
             font-size: 20px;
@@ -61,6 +65,13 @@
         .bag-list a{
             margin: 0 5px 0 5px;
         }
+        .state{
+            position: absolute;
+            left: -300px;
+            /* background: red; */
+            width: 300px;
+            top:0;
+        }
     </style>
     
     
@@ -72,35 +83,66 @@
         <p v-show="news">{{news}}</p>
         <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
         <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
+        <i-Button class='button3' type="primary" @click='openbag'>状态</i-Button>        
         <i-Button class='button3' type="primary" @click='gongfa'>功法</i-Button>
         <p v-show='bagoff' class='bag'>
+            <span class='bag-describe' v-if='bagdescribe'>{{bagdescribe}}<br>[级别]:{{baglvl}}<br>[伤害]:{{bagdamage}}<br>[价钱]:{{bagmoney}}<br></span>
             <span class='bag-title'>[物品列表]</span>
             <span class='bag-list'>你身上有碎银{{money}}两<a href="#">充值</a></span>
-            <span class='bag-list'>负重：{{weight}}/{{maxweight}}<a href="#">充值</a></span>            
-            <span v-for='(item, index) in nowbag' class='bag-list'>{{index}}.<a href="#">{{item.name}}</a><a href="#">使用</a><a href="#">出售</a><a href="#">送人</a></span>
+            <span class='bag-list'>负重：{{nowbag.length}}/{{maxweight}}<a href="#">充值</a></span> 
+            <span v-if='!nowbag.length'>你背包什么都没有。</span>           
+            <span v-for="(item, index) in nowbag" class='bag-list'>{{index+1}}.<a href="#" @click = hasbagdescribe(item.name)>{{item.name}}</a><a href="#">使用</a><a href="#" @click = selebag(index,item.money,item.name)>出售</a><a href="#">送人</a></span>
         </p>
-        
+        <div class='state'>
+            <p>游戏ID：{{userid}}</p>
+            <span>姓名：<a href="#" @click="handlename">{{username}}</a></span><br>
+            <p>等级：1级</p>
+            <p>功力：123</p>
+            <p>体力：100/100</p>
+            <p>内力：50/50</p>            
+        </div>
     </div>
     
     <script>
         var app = new Vue({
             el:'#app',
             data:{
+                userid :123,
+                username:'无名氏',
                 news:'',
                 money:100,
-                weight:0,
-                maxweight:100,
+                maxweight:30,
                 nowbag:[],
-                bagoff:!false
+                bagoff:false,
+                bagdescribe:'',
+                baglvl:0,
+                bagdamage:0,
+                bagmoney:0
+            },
+            computed:{
+                // nowbag22:function(){
+                //     if(cgetdata('bag')){
+                //         return str2arr(cgetdata('bag'));
+                //     } 
+                // }
             },
             methods:{
                 hasbook:function(){
+                    if(this.nowbag.length>=this.maxweight){
+                        this.$Notice.warning({
+                        title: '你的背包已满，获取不到更多东西',
+                        duration:5
+                    });
+                    return;
+                    }
                     var book = data.books;
                     var rnum = cr(0,book.length-1);
                     var newbook = book[rnum];
-                    console.log(newbook);
                     var nowbag = cgetdata('bag');
-                    console.log(nowbag)
+                    this.$Notice.open({
+                        title: '恭喜你获得了一本['+newbook.name+']',
+                        duration:5
+                    });
                     // return;
                     // 初始化
                     if(!nowbag){
@@ -109,24 +151,73 @@
                     }else{
                         nowbag = str2arr(nowbag);
                     }
-                    console.log(nowbag);
-                    console.log(newbook);
                     nowbag.push(newbook);
-                    console.log(nowbag);
                     // return;
                     csetdata('bag',arr2str(nowbag));
+                    this.nowbag = nowbag;
 
                 },
                 openbag:function(){
                     this.bagoff = !this.bagoff;
-                    this.nowbag = str2arr(cgetdata('bag'));
+                    this.bagdescribe ='';
+                    if(cgetdata('bag')){
+                        this.nowbag = str2arr(cgetdata('bag'));
+                    }
                 },
                 gongfa:function(){
-cdeldata('bag')
-    return;
+            cdeldata('bag')
+            return;
+                },
+                hasbagdescribe:function(name){
+                    for(var a in data.books){
+                        if(data.books[a].name==name){
+                            this.bagdescribe = data.books[a].describe;
+                            this.baglvl = data.books[a].lvl;
+                            this.bagdamage = data.books[a].damage;
+                            this.bagmoney = data.books[a].money;
+                        }
+                    }
+                },
+                selebag:function(index,money,name){
+                    var newbagg = this.nowbag;
+                    newbagg.splice(index,1);
+                    this.nowbag = newbagg;
+                    this.money =+money + +this.money;
+                    // console.log(typeof +money)
+                    csetdata('bag',arr2str(newbagg));
+                    // csetdata('money',this.money);
+                    
+                    
+                    this.$Notice.open({
+                        title: '你售出了['+name+']，一共获得了'+money+'两碎银',
+                        duration:1
+                    });
+                },
+                handlename:function(){
+                    this.$Modal.confirm({
+                    render: (h) => {
+                        return h('Input', {
+                            props: {
+                                autofocus: true,
+                                placeholder: '大侠，请留下你的名字！'
+                            },
+                            on: {
+                                input: (val) => {
+                                    this.username = val;
+                                    csetdata('username',val);
+                                }
+                            }
+                        })
+                    }
+                })
                 }
             }
         })
+        app.money = cgetdata('money');
+        app.username = cgetdata('username');
+        app.userid = cgetdata('id');
+        
+        
     </script>
     </body>
     </html>
