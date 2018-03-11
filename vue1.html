@@ -9,6 +9,8 @@
     <script type="text/javascript" src="js/iview.js"></script>
     <script type="text/javascript" src="js/data.js"></script>
     <script type="text/javascript" src="js/c.js"></script>
+    <script type="text/javascript" src="js/clipboard.min.js"></script>
+    
     <style>
         #app{
             width: 600px;
@@ -50,6 +52,8 @@
             display:block;
         }
         .bag{
+            height: 300px;
+            overflow: auto;
             position: absolute;
             right: -300px;
             width: 300px;
@@ -76,18 +80,35 @@
             width: 300px;
             top:0;
         }
+        .enemystatemsgtips{
+            color: red;
+        }
+        .mimalianjie{
+            overflow: auto;
+        }
     </style>
     
     
 </head>
 <body>
     <div id='app'>
+    <modal :closable="false">
+    </modal>
+    <!-- <Modal
+    v-model="modal1"
+    title="物品详情">
+    <p>{{nowbaglist.name}}</p>
+    <p>{{nowbaglist.describe}}</p>
+    <p>价值:{{nowbaglist.money}}</p>
+    <p>重量:{{nowbaglist.weight}}</p>
+    
+</Modal> -->
         <span class='localName'>[ 新手村 ]</span><a class='shuaxin' href="#">刷新</a>
         <div class='Spaces'></div>
         <p v-show="news">{{news}}</p>
         <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
         <i-Button class='button1' type="ghost" @click='custom' ><Icon type="bug"></Icon>攻击甲虫</i-Button>
-        
+
         <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
         <i-Button class='button3' type="primary" @click='openbag'>状态</i-Button>        
         <i-Button class='button3' type="primary" @click='gongfa'>功法</i-Button>
@@ -97,7 +118,7 @@
             <span class='bag-list'>你身上有碎银{{money}}两<a href="#">充值</a></span>
             <span class='bag-list'>负重：{{nowbag.length}}/{{maxweight}}<a href="#">充值</a></span> 
             <span v-if='!nowbag.length'>你背包什么都没有。</span>           
-            <span v-for="(item, index) in nowbag" class='bag-list'>{{index+1}}.<a href="#" @click = hasbagdescribe(item.name)>{{item.name}}</a><a href="#">使用</a><a href="#" @click = selebag(index,item.money,item.name)>出售</a><a href="#">送人</a></span>
+            <span v-for="(item, index) in nowbag" class='bag-list'>{{index+1}}.<a href="#" @click = hasbagdescribe(item.name)>{{item.name}}</a><a href="#">使用</a><a href="#" @click = selebag(index,item.money,item.name)>出售</a><a href="#" @click='handsendfriend(index,item.id,item.name)'>送人</a></span>
         </p>
         <div class='state'>
             <p>游戏ID：{{userid}}</p>
@@ -113,6 +134,9 @@
         var app = new Vue({
             el:'#app',
             data:{
+                modal1: false,
+                // 现在打开的物品数据
+                nowbaglist:{},
                 userid :123,
                 username:'无名氏',
                 news:'',
@@ -176,14 +200,21 @@
             return;
                 },
                 hasbagdescribe:function(name){
-                    for(var a in data.books){
-                        if(data.books[a].name==name){
-                            this.bagdescribe = data.books[a].describe;
-                            this.baglvl = data.books[a].lvl;
-                            this.bagdamage = data.books[a].damage;
-                            this.bagmoney = data.books[a].money;
+                    var nowbaglist = {};
+                    for(var a in data){
+                        if(data[a].name==name){
+                            console.log(data[a])
+                            nowbaglist =data[a];
                         }
                     }
+                    // this.modal1 = true;
+                    this.$Modal.confirm({
+                        title:'【'+nowbaglist.name+'】',
+                        content:`<p>${nowbaglist.describe}</p><br>
+                                <p>价值：${nowbaglist.money}</p>
+                            <p>重量：${nowbaglist.weight}</p>`
+                    })
+                    
                 },
                 selebag:function(index,money,name){
                     var newbagg = this.nowbag;
@@ -218,22 +249,79 @@
                     }
                 })
                 },
+                handsendfriend:function(index,pid,name){
+                    var pid =pid;
+                    var vals;
+                    this.$Modal.confirm({
+                    render: (h) => {
+                        return h('Input', {
+                            props: {
+                                autofocus: true,
+                                placeholder: '请输入你要送的玩家id。'
+                            },
+                            on: {
+                                input: (val) => {
+                                    // sendfirend(val,pid)
+                                    vals = val
+                                }
+                            }
+                        })
+                    },
+                    onOk:()=>{
+                        this.nowbag.splice(index,1);
+                        var a = sendfirend(vals,pid);
+                        csetdata('bag',arr2str(this.nowbag));
+                        console.log(vals);
+                        this.$Notice.success({
+                        title: '你发起了送礼申请',
+                        desc:`<div>你向玩家${vals}赠送了${name}</div><div>复制这条密码给该玩家，让其填入礼物盒中即可</div><a class='btn' data-clipboard-text="${a}">复制</a><div class='mimalianjie'>${a}</div>`,
+                        duration:0
+                });
+                    }
+                })
+                },
             custom () {
+                var speed = 1888;
                 var that = this;
-                var fmmsg = ['大喝一声，砍了一刀','大喝2声，砍了一刀','大喝3声，砍了一刀']
+                var user = {energy:100,max_energy:100,lvl:1,power:50,damage:15,name:'ryne',zhaoshi:'普通剑法'};
+                var enemy = {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1,n31:1,n30:1,n29:1},energy:100,max_energy:100,power:50,damage:2};
+                var fff = fightMessageArr(user,enemy);
+                console.log(fff);
                 this.$Modal.info({
-                            title: this.username +'与甲虫的对战',
-                            content: `<div class='fightmess'>你正在与对方对峙，大家都尚未出手攻击！</div>`
+                            okText:'加速',
+                            closable:false,
+                            title: this.username +'的对战',
+                            content: `<div class='fightmess'><div class='userstatemsg'>你看起来气血盈盛，丝毫不害怕。</div><div class='fightmsg'>你正在与对方对峙，大家都尚未出手攻击！</div><div class='enemystatemsg'>对方看起来气血盈盛，丝毫不害怕。</div><div class='enemystatemsgtips'>现在可以启动加速状态...</div></div>`,
+                            loading:true,
+                            onOk:()=>{
+                                speed=666;
+                            }
                         });
-                        var a = -1;
-                var timerfm = setInterval(function(){
+                var a = -1;
+                setTimeout(function(){
+                    var timerfm = setInterval(function(){
                     a++;
-                    document.querySelector('.fightmess').innerHTML = `<div>${fmmsg[a]}</div>`;
-                    
-                    if(a == fmmsg.length-1){
+                    document.querySelector('.fightmess').innerHTML = `<div class='userstatemsg'>${fff.msg[a].userstatemsg}</div><br><div class='fightmsg'>${fff.msg[a].fightmsg}</div><br><div class='enemystatemsg'>${fff.msg[a].enemystatemsg}</div>`;
+                    if(a == fff.msg.length-1){
+                        setTimeout(()=>{
+                            that.$Modal.remove();
+                        },1888)
+                        var names = keepTobag(fff.goods);
+                        that.$Notice.open({
+                        title: '恭喜你战斗胜利，获得100经验值',
+                        duration:2
+                    });
+                    for(var i in names){
+                        that.$Notice.open({
+                        title: '恭喜你战斗胜利，获得'+names[i],
+                        duration:2
+                    });
+                    }
                         clearInterval(timerfm);
                     }
-                },1000)
+                },speed)
+                },2000)
+
             },
             ccc(){
                 console.log(this.$Modal.info.content);
@@ -248,7 +336,12 @@
         app.money = cgetdata('money');
         app.username = cgetdata('username');
         app.userid = cgetdata('id');
+        var clipboard = new ClipboardJS('.btn');
         
+        clipboard.on('success', function(e) {
+            app.$Message.success('复制密码成功');
+            e.clearSelection();
+        });
     </script>
     </body>
     </html>

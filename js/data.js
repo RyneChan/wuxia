@@ -31,11 +31,8 @@ var data = [
         {id:'29',type:'consumables',name:'经验石[中]',lvl:1,describe:'能增加一些的经验值',money:1,weight:1,exp:500},
         {id:'30',type:'consumables',name:'经验石[大]',lvl:1,describe:'能增加大量的经验值',money:1,weight:1,exp:1000},
         {id:'31',type:'consumables',name:'经验石[特]',lvl:1,describe:'能增加超级多的经验值',money:1,weight:1,exp:5000},
-        {id:'32',type:'consumables',name:'传送符',lvl:1,describe:'有了这个才能随意在各个地方穿梭。',money:1,weight:1},
-        
-        
-        
+        {id:'32',type:'consumables',name:'传送符',lvl:1,describe:'有了这个才能随意在各个地方穿梭。',money:1,weight:1},      
 ]
 var enemy = [
-        {type:'animal',name:'甲虫',lvl:1,damage:10,describe:'一只小小的甲虫，好像随手都可以打死。',money:1,weight:1},
+        {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1},energy:100,max_energy:100,power:50,damage:2},
 ]

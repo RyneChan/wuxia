@@ -124,7 +124,6 @@ var iiid = '';
 function sendfirend(fid,pid){
 	// var a = "066214031991";
 	var a = fid;
-
 	// var p = 21;
 	var p = pid;
 	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -184,27 +183,15 @@ function hasfirend(uid,code){
 }
 
 var goods = {n10:1,n12:1};
-var user = {energy:100,max_energy:100,lvl:1,power:50,damage:15,name:'ryne',zhaoshi:'普通剑法'};
-var enemy = {energy:100,max_energy:100,lvl:1,power:50,damage:2,name:'甲虫'};
-var fffff = fightMessageArr(user,enemy);
-console.log(fffff)
+
 // 战斗描述，返回战斗描述arr
 function fightMessageArr(user,enemy){
 	var user =user;
 	var enemy =enemy;
-	var ue = user.energy;
-	var ul = user.lvl;
-	var up = user.power;
-	var ud = user.damage;
-	var ee = enemy.energy;
-	var el = enemy.lvl;
-	var ep = enemy.power;
-	var ed = enemy.damage;
-	var exp = enemy.exp;
-	var goods = enemy.goods;
+	console.log(enemy.goods)
 	var retmsg = {};
 	retmsg.msg = [];
-	if(ud>ee){
+	if(user.damage>=enemy.energy){
 		// 攻击大于敌人的血量，秒杀
 		retmsg.time =1;
 		b = {};
@@ -212,10 +199,10 @@ function fightMessageArr(user,enemy){
 		b.enemystatemsg = '看起来毫无气息。';
 		b.fightmsg =  enemy.name+'被你一招杀死了。大侠果然厉害！';
 		retmsg.msg.push(b);
-		retmsg.exp = exp;
-		retmsg.goods = enemyGoods(goods);
+		retmsg.exp = enemy.exp;
+		retmsg.goods = enemyGoods(enemy.goods);
 		return retmsg;
-	}else if(ed>ue){
+	}else if(user.energy<=enemy.damage){
 		// 血量小于敌人的伤害，被敌人秒杀
 		retmsg.time =1;
 		b = {};
@@ -227,10 +214,11 @@ function fightMessageArr(user,enemy){
 		return retmsg;
 	}
 	var hpstate = ['跳起来还击你','居然跳到你的肩上攻击你','绕后对你发起了攻击','想逃跑，但是还是先打你一下','看起来很凶，对你咬了一口'];
-	var huihe = Math.ceil(ee/ud);
+	var huihe = Math.ceil(enemy.energy/user.damage);
 	console.log(huihe);
 	var a123 = fight();
 	retmsg.user = user;
+	retmsg.goods = enemyGoods(enemy.goods);
 	
 	return retmsg;
 	function fight(){
@@ -292,11 +280,30 @@ function changeType(data,type){
 
 // 掉落物品计算  返回一个数组。代表物品id,注意，返回的是一个number
 function enemyGoods(goods){
+	
 	var newarr = [];
 	for(var i in goods){
 		if(cr(0,goods[i])==0){
 			newarr.push(+i.slice(1));
 		}
 	}
+	return newarr;
 }
 // enemyGoods(goods);
+
+
+// 存东西到背包里面
+function keepTobag(arr){
+	var nowbag = str2arr(cgetdata('bag'));
+	var namearr = [];
+	for(var i in arr){
+		for(var j in data){
+			if(arr[i] == +data[j].id){
+				nowbag.push(data[j]);
+				namearr.push(data[j].name)
+			}
+		}
+	}
+	csetdata('bag',arr2str(nowbag));
+	return namearr;
+}
