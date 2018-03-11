@@ -184,11 +184,14 @@ function hasfirend(uid,code){
 }
 
 var goods = {n10:1,n12:1};
-var user = {energy:100,lvl:1,power:50,damage:15,name:'ryne'};
-var enemy = {energy:100,lvl:1,power:50,damage:2,name:'甲虫'};
-fightMessageArr(user,enemy);
+var user = {energy:100,max_energy:100,lvl:1,power:50,damage:15,name:'ryne',zhaoshi:'普通剑法'};
+var enemy = {energy:100,max_energy:100,lvl:1,power:50,damage:2,name:'甲虫'};
+var fffff = fightMessageArr(user,enemy);
+console.log(fffff)
 // 战斗描述，返回战斗描述arr
 function fightMessageArr(user,enemy){
+	var user =user;
+	var enemy =enemy;
 	var ue = user.energy;
 	var ul = user.lvl;
 	var up = user.power;
@@ -223,20 +226,51 @@ function fightMessageArr(user,enemy){
 		retmsg.exp = -100;
 		return retmsg;
 	}
-	var hpstate = ['看起来气血盈盛，丝毫不害怕。','看起来不太灵光，好像随时会倒下。','看起来身受重伤，鲜血直流。','看起来奄奄一息，随时都会倒下。','看起来毫无气息。'];
+	var hpstate = ['跳起来还击你','居然跳到你的肩上攻击你','绕后对你发起了攻击','想逃跑，但是还是先打你一下','看起来很凶，对你咬了一口'];
 	var huihe = Math.ceil(ee/ud);
 	console.log(huihe);
-	fight();
-	function fight(user,enemy){
+	var a123 = fight();
+	retmsg.user = user;
+	
+	return retmsg;
+	function fight(){
 		if(huihe>0){
+			var newb = {};
+			user.energy = user.energy-enemy.damage;
+			enemy.energy = enemy.energy-user.damage;
+			if(user.energy>=user.max_energy*0.75&&user.energy<user.max_energy){
+				newb.userstatemsg = '你看起来气血盈盛，丝毫不害怕。';
+			}else if(user.energy>=user.max_energy*0.5&&user.energy<user.max_energy*0.75){
+				newb.userstatemsg = '你看起来不太灵光，好像随时会倒下。';
+			}else if(user.energy>=user.max_energy*0.25&&user.energy<user.max_energy*0.5){
+				newb.userstatemsg = '你看起来身受重伤，鲜血直流。';
+			}else if(user.max_energy>=0&&user.energy<user.max_energy*0.25){
+				newb.userstatemsg = '你看起来奄奄一息，随时都会倒下。';
+			}else if(user.energy<=0){
+				newb.userstatemsg = '你看起来毫无气息。';
+			}
+			if(enemy.energy>=enemy.max_energy*0.75&&enemy.energy<enemy.max_energy){
+				newb.enemystatemsg = enemy.name+'看起来气血盈盛，丝毫不害怕。';
+			}else if(enemy.energy>=enemy.max_energy*0.5&&enemy.energy<enemy.max_energy*0.75){
+				newb.enemystatemsg = enemy.name+'看起来不太灵光，好像随时会倒下。';
+			}else if(enemy.energy>=enemy.max_energy*0.25&&enemy.energy<enemy.max_energy*0.5){
+				newb.enemystatemsg = enemy.name+'看起来身受重伤，鲜血直流。';
+			}else if(enemy.energy>=0&&enemy.energy<enemy.max_energy*0.25){
+				newb.enemystatemsg = enemy.name+'看起来奄奄一息，随时都会倒下。';
+			}else if(enemy.energy<=0){
+				newb.enemystatemsg = enemy.name+'看起来毫无气息。';
+			}
+			newb.fightmsg = '你对'+enemy.name+'使出了一招'+user.zhaoshi+',然后'+enemy.name+hpstate[cr(0,hpstate.length-1)];
+			retmsg.msg.push(newb);
 			console.log(huihe);
-			
-
-
+			console.log('玩家血量'+user.energy);
+			console.log('npc血量'+enemy.energy);
+			console.log(retmsg.msg);
 			huihe--;
 			fight();
 		}else{
-			return;
+
+			return 123;
 		}
 	}
 
