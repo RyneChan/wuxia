@@ -26,13 +26,17 @@
             margin-left: 20px;
             
         }
+        /* .ivu-modal-confirm-body{
+            max-height: 200px;
+            overflow: auto;
+        } */
         .Spaces{
             width: 100%;
             height: 20px;
         }
         .button1{
             display:block;
-            
+            margin-top: 5px;
         }
         .button2{
             margin-top:200px;
@@ -82,6 +86,8 @@
         <div class='Spaces'></div>
         <p v-show="news">{{news}}</p>
         <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
+        <i-Button class='button1' type="ghost" @click='custom' ><Icon type="bug"></Icon>攻击甲虫</i-Button>
+        
         <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
         <i-Button class='button3' type="primary" @click='openbag'>状态</i-Button>        
         <i-Button class='button3' type="primary" @click='gongfa'>功法</i-Button>
@@ -117,7 +123,8 @@
                 bagdescribe:'',
                 baglvl:0,
                 bagdamage:0,
-                bagmoney:0
+                bagmoney:0,
+                fightmessage:'你正在与对方对峙，大家都尚未出手攻击！'
             },
             computed:{
                 // nowbag22:function(){
@@ -135,7 +142,7 @@
                     });
                     return;
                     }
-                    var book = data.books;
+                    var book = changeType(data,'book');
                     var rnum = cr(0,book.length-1);
                     var newbook = book[rnum];
                     var nowbag = cgetdata('bag');
@@ -210,13 +217,37 @@
                         })
                     }
                 })
-                }
+                },
+            custom () {
+                var that = this;
+                var fmmsg = ['大喝一声，砍了一刀','大喝2声，砍了一刀','大喝3声，砍了一刀']
+                this.$Modal.info({
+                            title: this.username +'与甲虫的对战',
+                            content: `<div class='fightmess'>你正在与对方对峙，大家都尚未出手攻击！</div>`
+                        });
+                        var a = -1;
+                var timerfm = setInterval(function(){
+                    a++;
+                    document.querySelector('.fightmess').innerHTML = `<div>${fmmsg[a]}</div>`;
+                    
+                    if(a == fmmsg.length-1){
+                        clearInterval(timerfm);
+                    }
+                },1000)
+            },
+            ccc(){
+                console.log(this.$Modal.info.content);
+                // var that = this;
+                var c = this.$Modal.info.content;
+                // var b = setInterval(function(){
+                //     c= c+'123';
+                // },1000)
+            }
             }
         })
         app.money = cgetdata('money');
         app.username = cgetdata('username');
         app.userid = cgetdata('id');
-        
         
     </script>
     </body>
