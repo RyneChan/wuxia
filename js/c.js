@@ -54,6 +54,9 @@ function arr2str(arr,space){
 }
 // str转arr
 function str2arr(str,space){
+	if(typeof str!="string"){
+		return;
+	}
 	var point;
 	if(space == undefined){
 		point = "$cCtV@$";
@@ -125,7 +128,7 @@ function sendfirend(fid,pid){
 	// var a = "066214031991";
 	var a = fid;
 	// var p = 21;
-	var p = pid;
+	var p = +pid;
 	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 	var b = [];
 	for(var i=0;i<41;i++){
@@ -147,13 +150,26 @@ function sendfirend(fid,pid){
 	// var www = 'a';
 	// console.log(p.toString(16))
 	// console.log(parseInt(www,16))
-	// console.log(b.join(''));
-	iiid = b.join('');
-	return iiid;
-}
-sendfirend('066214031991',21);
+	console.log(b.join(''));
+	var aaaa = hasfirend(a,b.join(''));
+	
+	console.log(p);
+	
+	
+	console.log(aaaa);
+	
+	console.log(aaaa == p)
+	if(aaaa == p){
+		iiid = b.join('');
+		return iiid;
+	}else{
+		return false
+	}
 
-var aasd = hasfirend('066214031991',iiid)
+}
+// sendfirend('066214031991',21);
+
+// var aasd = hasfirend('066214031991',iiid)
 // console.log(aasd)
 function hasfirend(uid,code){
 	// var uid =  "066214031991";
@@ -295,6 +311,9 @@ function enemyGoods(goods){
 // 存东西到背包里面
 function keepTobag(arr){
 	var nowbag = str2arr(cgetdata('bag'));
+	if(!nowbag){
+		nowbag=[];
+	}
 	var namearr = [];
 	for(var i in arr){
 		for(var j in data){
@@ -306,4 +325,14 @@ function keepTobag(arr){
 	}
 	csetdata('bag',arr2str(nowbag));
 	return namearr;
+}
+
+
+// 根据id找敌人 传入的必须为number
+function findenemy(id){
+	for(var i in enemyData){
+		if(id == +enemyData[i].id){
+			return enemyData[i]
+		}
+	}
 }

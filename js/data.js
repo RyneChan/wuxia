@@ -33,6 +33,8 @@ var data = [
         {id:'31',type:'consumables',name:'经验石[特]',lvl:1,describe:'能增加超级多的经验值',money:1,weight:1,exp:5000},
         {id:'32',type:'consumables',name:'传送符',lvl:1,describe:'有了这个才能随意在各个地方穿梭。',money:1,weight:1},      
 ]
-var enemy = [
-        {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1},energy:100,max_energy:100,power:50,damage:2},
+var enemyData = [
+        {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1,n31:1,n30:1,n29:1},energy:100,max_energy:100,power:50,damage:2},
+        {id:'2',type:'animal',name:'大甲虫',lvl:2,describe:'一只很大的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1,n31:1,n30:1,n29:1},energy:150,max_energy:150,power:50,damage:3},
+        
 ]

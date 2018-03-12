@@ -107,7 +107,7 @@
         <div class='Spaces'></div>
         <p v-show="news">{{news}}</p>
         <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
-        <i-Button class='button1' type="ghost" @click='custom' ><Icon type="bug"></Icon>攻击甲虫</i-Button>
+        <i-Button class='button1' type="ghost" @click='custom(2)' ><Icon type="bug"></Icon>攻击甲虫</i-Button>
 
         <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
         <i-Button class='button3' type="primary" @click='openbag'>状态</i-Button>        
@@ -268,23 +268,33 @@
                         })
                     },
                     onOk:()=>{
-                        this.nowbag.splice(index,1);
                         var a = sendfirend(vals,pid);
+                        if(a){
+                        this.nowbag.splice(index,1);                            
                         csetdata('bag',arr2str(this.nowbag));
                         console.log(vals);
                         this.$Notice.success({
                         title: '你发起了送礼申请',
                         desc:`<div>你向玩家${vals}赠送了${name}</div><div>复制这条密码给该玩家，让其填入礼物盒中即可</div><a class='btn' data-clipboard-text="${a}">复制</a><div class='mimalianjie'>${a}</div>`,
                         duration:0
-                });
+                        });
+                        }else{
+                        this.$Notice.error({
+                        title: '抱歉，生成密码失败',
+                        desc:'你可以点击重新生成。[ '+name+' ]已经退回你的背包。出现这样的错误我深感抱歉。',
+                        duration:0
+                        });
+                        }
+
                     }
                 })
                 },
-            custom () {
+            custom (enemy) {
                 var speed = 1888;
                 var that = this;
                 var user = {energy:100,max_energy:100,lvl:1,power:50,damage:15,name:'ryne',zhaoshi:'普通剑法'};
-                var enemy = {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1,n31:1,n30:1,n29:1},energy:100,max_energy:100,power:50,damage:2};
+                var enemy = findenemy(enemy);
+                // var enemy = {id:'1',type:'animal',name:'甲虫',lvl:1,describe:'一只小小的甲虫，好像随手都可以打死。',money:10,exp:10,goods:{n10:1,n32:1,n31:1,n30:1,n29:1},energy:100,max_energy:100,power:50,damage:2};
                 var fff = fightMessageArr(user,enemy);
                 console.log(fff);
                 this.$Modal.info({
@@ -297,7 +307,7 @@
                                 speed=666;
                             }
                         });
-                var a = -1;
+                var a = 0;
                 setTimeout(function(){
                     var timerfm = setInterval(function(){
                     a++;
