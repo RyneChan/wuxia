@@ -159,6 +159,7 @@ function sendfirend(fid,pid){
 	console.log(aaaa);
 	
 	console.log(aaaa == p)
+	iiid = b.join('');
 	if(aaaa == p){
 		iiid = b.join('');
 		return iiid;
@@ -167,13 +168,7 @@ function sendfirend(fid,pid){
 	}
 
 }
-// sendfirend('066214031991',21);
-
-// var aasd = hasfirend('066214031991',iiid)
-// console.log(aasd)
 function hasfirend(uid,code){
-	// var uid =  "066214031991";
-	// var code = 'Pbs2Id0dW9rO8eExjAp5CEX1Mkqz3kHqSIDK15EvrW';
 	var str = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 	var wei = code[28];
 	if(code[wei]==uid[wei]){
@@ -181,8 +176,6 @@ function hasfirend(uid,code){
 			if(code[wei*2+1]==uid[wei*2+1]){
 				var a = str.indexOf(code[29]);
 				var h = '';
-				// console.log('29wei'+code[29])
-				// console.log('a'+a)
 				for(let i=0;i<code.length-40;i++){
 					h = h+code[(a+i)];
 				}
@@ -335,4 +328,23 @@ function findenemy(id){
 			return enemyData[i]
 		}
 	}
+}
+
+// 根据id找物品，传入的必须为number
+function findgoods(id){
+	for(var i in data){
+		if(id == +data[i].id){
+			return data[i]
+		}
+	}
+}
+
+// 礼包码检测
+function libaoma(str){
+	console.log(str);
+	if(!cgetdata('libao')){
+		csetdata('libao','1');
+	}
+	console.log()
+	return cgetdata('libao').indexOf(str);
 }

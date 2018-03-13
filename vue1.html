@@ -41,23 +41,30 @@
             margin-top: 5px;
         }
         .button2{
-            margin-top:200px;
             display:block;
             float: left;
         }
         .button3{
-            margin-top:200px;
             float: left;
             margin-left: 10px;
             display:block;
         }
+        .button4{
+            float: left;
+            margin-top: 15px;
+        }
         .bag{
             height: 300px;
-            overflow: auto;
+            /* overflow: auto; */
             position: absolute;
             right: -300px;
             width: 300px;
+            /* background: red; */
             top:0;
+        }
+        .butbox{
+            position: absolute;
+            top:350px;
         }
         .bag-describe{
             width: 300px;
@@ -106,19 +113,24 @@
         <span class='localName'>[ 新手村 ]</span><a class='shuaxin' href="#">刷新</a>
         <div class='Spaces'></div>
         <p v-show="news">{{news}}</p>
-        <i-Button class='button1' type="primary" @click='hasbook'>打开宝箱</i-Button>
+        <i-Button class='button1' type="primary" @click='hasdata("book",[1,23,4,5])'>打开宝箱</i-Button>
         <i-Button class='button1' type="ghost" @click='custom(2)' ><Icon type="bug"></Icon>攻击甲虫</i-Button>
+        <div class='butbox'>
+            <i-Button class='button2' @click='openbag'>背囊</i-Button>
+            <i-Button class='button3' @click='openbag'>状态</i-Button>        
+            <i-Button class='button3' @click=''>功法</i-Button><br>
+            <i-Button class='button4' @click='liwuhe'>礼物盒</i-Button>
+        </div>
 
-        <i-Button class='button2' type="primary" @click='openbag'>背囊</i-Button>
-        <i-Button class='button3' type="primary" @click='openbag'>状态</i-Button>        
-        <i-Button class='button3' type="primary" @click='gongfa'>功法</i-Button>
+        
         <p v-show='bagoff' class='bag'>
-            <span class='bag-describe' v-if='bagdescribe'>{{bagdescribe}}<br>[级别]:{{baglvl}}<br>[伤害]:{{bagdamage}}<br>[价钱]:{{bagmoney}}<br></span>
             <span class='bag-title'>[物品列表]</span>
             <span class='bag-list'>你身上有碎银{{money}}两<a href="#">充值</a></span>
             <span class='bag-list'>负重：{{nowbag.length}}/{{maxweight}}<a href="#">充值</a></span> 
-            <span v-if='!nowbag.length'>你背包什么都没有。</span>           
-            <span v-for="(item, index) in nowbag" class='bag-list'>{{index+1}}.<a href="#" @click = hasbagdescribe(item.name)>{{item.name}}</a><a href="#">使用</a><a href="#" @click = selebag(index,item.money,item.name)>出售</a><a href="#" @click='handsendfriend(index,item.id,item.name)'>送人</a></span>
+            <span v-if='!nowbag.length'>你背包什么都没有。</span>
+            <span v-for="(item, index) in chulinowbag[bagindex]" class='bag-list'>{{bagindex*10+index+1}}.<a href="#" @click = hasbagdescribe(item.name)>{{item.name}}</a><a href="script:;">使用</a><a href="#" @click = selebag(index,item.money,item.name)>出售</a><a href="#" @click='handsendfriend(index,item.id,item.name)'>送人</a></span>
+            <Page :total="nowbag.length" :page-size='10' simple @on-change='bagchange'></Page>         
+
         </p>
         <div class='state'>
             <p>游戏ID：{{userid}}</p>
@@ -126,29 +138,32 @@
             <p>等级：1级</p>
             <p>功力：123</p>
             <p>体力：100/100</p>
-            <p>内力：50/50</p>            
+            <p>内力：50/50</p>       
         </div>
     </div>
-    
     <script>
         var app = new Vue({
             el:'#app',
             data:{
                 modal1: false,
                 // 现在打开的物品数据
-                nowbaglist:{},
                 userid :123,
                 username:'无名氏',
                 news:'',
                 money:100,
                 maxweight:30,
                 nowbag:[],
+                chulinowbag:[],
                 bagoff:false,
-                bagdescribe:'',
-                baglvl:0,
-                bagdamage:0,
-                bagmoney:0,
-                fightmessage:'你正在与对方对峙，大家都尚未出手攻击！'
+                // 玩家属性数据
+                energy:100,
+                max_energy:100,
+                exp:0,
+                max_exp:100,
+                mp:50,
+                max_mp:50,
+                damage:10,
+                bagindex:0
             },
             computed:{
                 // nowbag22:function(){
@@ -158,7 +173,7 @@
                 // }
             },
             methods:{
-                hasbook:function(){
+                hasdata:function(type,ids){
                     if(this.nowbag.length>=this.maxweight){
                         this.$Notice.warning({
                         title: '你的背包已满，获取不到更多东西',
@@ -166,34 +181,51 @@
                     });
                     return;
                     }
-                    var book = changeType(data,'book');
-                    var rnum = cr(0,book.length-1);
-                    var newbook = book[rnum];
                     var nowbag = cgetdata('bag');
-                    this.$Notice.open({
-                        title: '恭喜你获得了一本['+newbook.name+']',
-                        duration:5
-                    });
-                    // return;
-                    // 初始化
                     if(!nowbag){
-                        console.log('初始化...');
                         nowbag = [];
                     }else{
                         nowbag = str2arr(nowbag);
                     }
-                    nowbag.push(newbook);
-                    // return;
-                    csetdata('bag',arr2str(nowbag));
+                    if(type=='user'){
+                        for(var i in ids){
+                            nowbag.push(findgoods(ids[i]));
+                            this.$Notice.open({
+                                title: '恭喜你获得了['+findgoods(ids[i]).name+']',
+                            duration:5
+                            });
+                        }
+                    }else{
+                        var goodtype = changeType(data,type);
+                        var newgood = goodtype[cr(0,goodtype.length-1)];
+                        nowbag.push(newgood);
+                        this.$Notice.open({
+                                title: '恭喜你获得了['+newgood.name+']',
+                            duration:5
+                            });
+                    }
                     this.nowbag = nowbag;
-
+                    csetdata('bag',arr2str(nowbag));
                 },
                 openbag:function(){
                     this.bagoff = !this.bagoff;
-                    this.bagdescribe ='';
-                    if(cgetdata('bag')){
-                        this.nowbag = str2arr(cgetdata('bag'));
+                if(cgetdata('bag')){
+                    this.nowbag = str2arr(cgetdata('bag'));
+                 }
+                var chuli = [];
+                this.chulinowbag = [];
+                console.log(this.nowbag.length);
+                for(var i=0;i<this.nowbag.length;i++){
+                    console.log(i)
+                    chuli.push(this.nowbag[i]);
+                    if(i%10==0){
+                        this.chulinowbag.unshift(chuli);
+                        console.log(this.chulinowbag)
+                        
+                        chuli=[];
                     }
+                }
+                console.log(this.chulinowbag)
                 },
                 gongfa:function(){
             cdeldata('bag')
@@ -340,6 +372,50 @@
                 // var b = setInterval(function(){
                 //     c= c+'123';
                 // },1000)
+            },
+            bagchange(e){
+                this.bagindex = e-1;
+            },
+            liwuhe(){
+                var vals;
+                this.$Modal.confirm({
+                    render: (h) => {
+                        return h('Input', {
+                            props: {
+                                autofocus: true,
+                                placeholder: '请输入你收到的礼品码。'
+                            },
+                            on: {
+                                input: (val) => {
+                                    vals = val
+                                }
+                            }
+                        })
+                    },
+                    onOk:()=>{
+                        if(vals){
+                            if(libaoma(vals)>0){
+                                this.$Notice.error({
+                                    title: '该兑换码已经使用过了。',
+                                });
+                                return;
+                            }
+                            var id = cgetdata('id');
+                            var goodsid = hasfirend(id,vals);
+                            var goods = findgoods(+goodsid);
+                            if(goods){
+                                var a = cgetdata('libao')+vals;
+                                csetdata('libao',a);
+                                this.nowbag.push(goods);
+                                csetdata('bag',arr2str(this.nowbag));
+                                this.$Notice.success({
+                                    title: '兑换成功！恭喜你获得'+goods.name,
+                                });
+                            }
+
+                        }
+                    }
+                })
             }
             }
         })
